@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { query } from '@/lib/sqlite-database'
+import { pool } from '@/lib/database'
 import type { User } from '@/lib/types'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production'
@@ -19,20 +19,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find user by email
-    const result = await query(
-      'SELECT id, email, password_hash, name, role, department, location, created_at FROM users WHERE email = ?',
-      [email]
-    )
-
-    if (result.length === 0) {
-      return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
+    // Find user by email using PostgreSQL
+    const client = await pool.connect()
+    
+    try {
+      const result = await client.query(
+        'SELECT id, email, password_hash, name, role, department, location, created_at FROM users WHERE email = $1',
+        [email]
       )
-    }
 
-    const user = result[0]
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { error: 'Invalid credentials' },
+          { status: 401 }
+        )
+      }
+
+      const user = result.rows[0]
 
       // Verify password
       const isValidPassword = await bcrypt.compare(password, user.password_hash)
@@ -50,21 +53,24 @@ export async function POST(request: NextRequest) {
         { expiresIn: '7d' }
       )
 
-    // Return user data (without password hash)
-    const userResponse: User = {
-      id: user.id.toString(),
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      department: user.department,
-      location: user.location,
-      createdAt: new Date(user.created_at)
-    }
+      // Return user data (without password hash)
+      const userResponse: User = {
+        id: user.id.toString(),
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        department: user.department,
+        location: user.location,
+        createdAt: new Date(user.created_at)
+      }
 
-    return NextResponse.json({
-      user: userResponse,
-      token
-    })
+      return NextResponse.json({
+        user: userResponse,
+        token
+      })
+    } finally {
+      client.release()
+    }
 
   } catch (error) {
     console.error('Login error:', error)

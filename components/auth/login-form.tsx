@@ -52,7 +52,7 @@ export function LoginForm() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Ticket System</CardTitle>
+          <CardTitle className="text-2xl font-bold">SMILe Ticket System</CardTitle>
           <CardDescription>Sign in to access your dashboard</CardDescription>
         </CardHeader>
         <CardContent>

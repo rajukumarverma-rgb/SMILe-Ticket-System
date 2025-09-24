@@ -125,7 +125,7 @@ export function Sidebar({ user }: SidebarProps) {
         </div>
         {!isCollapsed && (
           <div className="flex-1">
-            <h1 className="font-semibold text-sidebar-foreground">Ticket System</h1>
+            <h1 className="font-semibold text-sidebar-foreground">SMILe Ticket System</h1>
           </div>
         )}
         <ThemeToggle />

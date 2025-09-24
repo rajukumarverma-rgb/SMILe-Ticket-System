@@ -34,7 +34,7 @@ export async function initializeDatabase() {
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         name VARCHAR(255) NOT NULL,
-        role VARCHAR(50) NOT NULL CHECK (role IN ('channel_partner', 'assignee', 'head_office', 'technical')),
+        role VARCHAR(50) NOT NULL CHECK (role IN ('channel_partner', 'assignee', 'audit_support', 'head_office', 'technical')),
         department VARCHAR(255),
         location VARCHAR(255),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
